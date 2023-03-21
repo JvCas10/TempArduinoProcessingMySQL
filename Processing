@@ -1,0 +1,105 @@
+import de.bezier.data.sql.*;
+
+MySQL msql;
+
+import processing.serial.*;
+
+Serial myPort; //Puerto en donde esta conectado el arduino
+
+//Base de datos
+MySQL sql;
+String user = "root";
+String pass = "Coatepeque2003";
+String server = "localhost";
+String database = "lab4";
+String[] columnNames;
+
+//temperatura y humedad
+int te=0, hu=0;
+
+
+int[] serialInArray = new int[2];
+int serialCount = 0;
+boolean firstContact = false;
+
+
+
+void setup() {
+  
+  String portName = Serial.list()[0];
+  myPort = new Serial(this, portName, 9600);
+  String user     = "root";
+  String pass     = "Coatepeque2003";
+  String database = "lab4";
+
+  msql = new MySQL( this, "localhost", database, user, pass );
+}
+
+
+//Lectura
+void serialEvent(Serial myPort){
+    int inByte = myPort.read();
+    if(firstContact == false){
+      if(inByte == 'A'){
+        myPort.clear();
+        firstContact = true;
+        myPort.write('A');
+      }
+    }
+    else{
+      serialInArray[serialCount] = inByte;
+      serialCount++;
+    
+    
+    if(serialCount>1){
+      te = serialInArray[0];
+      hu = serialInArray[1];
+      
+      myPort.write('A');
+      serialCount = 0;
+    }  
+  }
+
+}
+
+
+void draw() {
+  
+  //Impresion de datos
+  println(te);
+  println(hu);
+  
+  float humedad = Float.intBitsToFloat(hu);
+  float temperatura = Float.intBitsToFloat(te);
+
+  int i = 1;
+  
+  if ((humedad != 0.0) && (temperatura!=0.0)) {
+    while (i<10) {
+      int hour = hour();
+      int minute = minute();
+      int second = second();
+      String tiempo = hour + ":" + minute + ":" + second;
+
+      int day = day();
+      int month = month();
+      int year = year();
+      String fecha = day+ "-" + month + "-" + year;
+
+      String hora = fecha + " " + tiempo;
+
+     if ( msql.connect() ) {
+        String[] columnas=new String[] {"Id_temperatura", "Valor_temperatura", "Valor_humedad", "Hora"};
+        Object[] valor= new Object[] {i, te, hu, hora};
+        msql.insertUpdateInDatabase("datos", columnas, valor);
+      } else {
+        // Conexion fallida !
+      }
+      delay(3000);
+      i++;
+      te = serialInArray[0];
+      hu = serialInArray[1];
+    }
+    noLoop();
+  }
+}
