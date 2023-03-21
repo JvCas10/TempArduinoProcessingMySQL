@@ -1,0 +1,48 @@
+#include "DHT.h"
+#define DHTPIN 7
+#define DHTTYPE DHT11
+
+int inByte = 0;
+
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin(); // Iniciar sensor
+  establishContact();
+}
+
+void loop() {
+
+
+  // Leer humedad
+  float humi  = dht.readHumidity();
+  // Leer temperatura
+  float tempC = dht.readTemperature();
+
+    if (Serial.available() > 0){
+    inByte = Serial.read();
+
+    int tmp = tempC;
+    delay(10);
+    int hmd = humi;
+
+    Serial.write(tmp);
+    Serial.write(hmd);
+    
+  }
+
+  //Verificar si algun campo falla
+  if (isnan(humi) || isnan(tempC)) {
+    Serial.println("Failed to read from DHT sensor!");
+  } else {
+
+  }
+}
+
+void establishContact() {
+  while (Serial.available() <= 0){
+    Serial.print('A');
+    delay(300);
+  }
+}
