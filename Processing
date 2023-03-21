@@ -24,7 +24,7 @@ void setup() {
   String portName = Serial.list()[0];
   myPort = new Serial(this, portName, 9600);
   String user     = "root";
-  String pass     = "Coatepeque2003";
+  String pass     = "Contrasena";
   String database = "lab4";
 
   msql = new MySQL( this, "localhost", database, user, pass );
