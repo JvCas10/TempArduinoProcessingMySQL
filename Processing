@@ -1,17 +1,12 @@
 import de.bezier.data.sql.*;
-
 MySQL msql;
-
 import processing.serial.*;
 
 Serial myPort; //Puerto en donde esta conectado el arduino
 
 //Base de datos
 MySQL sql;
-String user = "root";
-String pass = "Coatepeque2003";
-String server = "localhost";
-String database = "lab4";
+
 String[] columnNames;
 
 //temperatura y humedad
